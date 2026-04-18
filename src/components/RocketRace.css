@@ -17,17 +17,17 @@
   background: linear-gradient(to top, rgba(10, 30, 60, 0.3) 0%, rgba(10, 30, 60, 0) 100%);
   border-radius: 15px;
   border: 1px solid rgba(100, 150, 255, 0.2);
-  padding: 20px;
   overflow: hidden;
 }
 
 .height-markers {
   position: absolute;
-  top: 40px;
+  top: 60px;
   bottom: 100px;
-  left: 20px;
-  right: 20px;
+  left: 30px;
+  right: 30px;
   pointer-events: none;
+  z-index: 1;
 }
 
 .marker {
@@ -49,17 +49,21 @@
 }
 
 .rockets-container {
-  position: relative;
+  position: absolute;
+  top: 40px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
   display: flex;
   align-items: stretch;
   justify-content: flex-start;
   gap: 8px;
-  height: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 40px 10px 80px 10px;
+  padding-bottom: 60px;
   scrollbar-width: thin;
   scrollbar-color: rgba(100, 150, 255, 0.5) rgba(10, 30, 60, 0.3);
+  z-index: 2;
 }
 
 .rockets-container::-webkit-scrollbar {
@@ -79,7 +83,7 @@
 .rocket-slot {
   flex: 0 0 70px;
   position: relative;
-  height: 100%;
+  min-height: 100%;
 }
 
 .rocket-slot.top-rank {
@@ -362,11 +366,21 @@
   .race-track {
     min-height: 500px;
     height: 500px;
-    padding: 15px;
   }
 
   .rockets-container {
-    padding: 50px 8px 70px 8px;
+    top: 40px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    padding-bottom: 55px;
+  }
+
+  .height-markers {
+    top: 55px;
+    bottom: 90px;
+    left: 25px;
+    right: 25px;
   }
 
   .rocket-slot {
@@ -437,14 +451,24 @@
   }
 
   .race-track {
-    min-height: 420px;
-    height: 420px;
-    padding: 10px;
+    min-height: 450px;
+    height: 450px;
   }
 
   .rockets-container {
-    padding: 40px 4px 60px 4px;
+    top: 35px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    padding-bottom: 50px;
     gap: 4px;
+  }
+
+  .height-markers {
+    top: 50px;
+    bottom: 75px;
+    left: 20px;
+    right: 20px;
   }
 
   .rocket-slot {
@@ -529,8 +553,8 @@
 /* Small mobile (iPhone SE, etc) */
 @media (max-width: 375px) {
   .race-track {
-    min-height: 380px;
-    height: 380px;
+    min-height: 400px;
+    height: 400px;
   }
 
   .rocket-slot {
