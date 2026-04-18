@@ -196,15 +196,46 @@
 
   .subtitle {
     font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  .monitor-header {
+    margin-bottom: 15px;
+  }
+
+  .summary-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 15px;
+    width: 100%;
   }
 
   .summary-item {
-    min-width: 80px;
-    padding: 6px 10px;
-    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    flex: unset;
+  }
+
+  .summary-label {
+    font-size: 9px;
   }
 
   .summary-value {
-    font-size: 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  .title {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    font-size: 9px;
+  }
+
+  .summary-value {
+    font-size: 11px;
   }
 }

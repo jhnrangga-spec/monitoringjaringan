@@ -196,32 +196,85 @@ html, body, #root {
   }
 }
 
+/* iPhone 11 and large mobile */
 @media (max-width: 480px) {
+  .start-dashboard {
+    padding: 15px;
+  }
+
   .dashboard-title {
     font-size: 28px;
     margin-bottom: 10px;
+    line-height: 1.2;
   }
 
   .dashboard-subtitle {
-    font-size: 12px;
+    font-size: 11px;
     margin-bottom: 30px;
+    letter-spacing: 1px;
   }
 
   .start-button {
-    padding: 12px 25px;
+    padding: 14px 30px;
     font-size: 14px;
+    letter-spacing: 1.5px;
   }
 
   .features {
-    flex-direction: column;
     gap: 10px;
     margin-top: 30px;
   }
 
+  .feature {
+    flex: 1 1 45%;
+    min-width: unset;
+    padding: 12px;
+  }
+
+  .feature-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .feature p {
+    font-size: 11px;
+  }
+
+  .dashboard-footer {
+    font-size: 10px;
+    margin-top: 30px;
+    letter-spacing: 0.5px;
+  }
+
   .stop-button {
-    padding: 10px 15px;
-    font-size: 12px;
-    top: 15px;
-    right: 15px;
+    padding: 10px 18px;
+    font-size: 11px;
+    top: 12px;
+    right: 12px;
+    letter-spacing: 0.5px;
+  }
+}
+
+/* Small mobile (iPhone SE, Galaxy S8, etc) */
+@media (max-width: 360px) {
+  .dashboard-title {
+    font-size: 24px;
+  }
+
+  .dashboard-subtitle {
+    font-size: 10px;
+  }
+
+  .features {
+    flex-direction: column;
+  }
+
+  .feature {
+    flex: 1 1 auto;
+  }
+
+  .start-button {
+    padding: 12px 24px;
+    font-size: 13px;
   }
 }
