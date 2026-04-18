@@ -38,10 +38,13 @@ function formatMbps(value) {
 
 export default function RocketRace({ clients }) {
   // Split into active (racing) and inactive (repair station)
-  const { activeClients, inactiveClients } = useMemo(() => {
+  const { activeClients, inactiveClients, trackClients } = useMemo(() => {
     const active = clients.filter((c) => c.isActive)
     const inactive = clients.filter((c) => !c.isActive)
-    return { activeClients: active, inactiveClients: inactive }
+    // Race track shows only the top climbers so rockets don't get squished.
+    // Every active client still appears in the leaderboard below.
+    const track = active.slice(0, 15)
+    return { activeClients: active, inactiveClients: inactive, trackClients: track }
   }, [clients])
 
   const maxClientBw = useMemo(() => {
@@ -96,7 +99,7 @@ export default function RocketRace({ clients }) {
               </div>
             ) : (
               <AnimatePresence>
-                {activeClients.map((client, index) => {
+                {trackClients.map((client, index) => {
                   // Altitude maps directly to Mbps — 0 Mbps sits on the ground,
                   // the max-altitude marker is the ceiling. No percent scaling.
                   const heightRatio = client.total / maxAltitudeMbps
