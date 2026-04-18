@@ -63,7 +63,8 @@ export default function RocketRace({ clients }) {
           <AnimatePresence>
             {clients.map((client, index) => {
               const heightRatio = client.total / maxClientBw
-              const heightPercent = Math.min(heightRatio * 100, 95)
+              // Cap at 72% so rocket body + medal badge stay within track box
+              const heightPercent = Math.min(heightRatio * 100, 72)
               const color = getColorForIndex(index)
               const isTop3 = index < 3 && client.isActive && client.total > 0
 
