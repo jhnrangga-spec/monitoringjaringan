@@ -44,45 +44,28 @@ export default async function handler(req, res) {
 
     let trafficMap = {}
 
+    // Use /interface/monitor-traffic with =once= for each active interface
+    // Individual calls are more reliable than batched across RouterOS versions
     if (activeInterfaceNames.length > 0) {
-      try {
-        // Batch request - monitor-traffic supports multiple interfaces
-        const trafficData = await conn.write('/interface/monitor-traffic', [
-          '=interface=' + activeInterfaceNames.join(','),
-          '=once=',
-        ])
-
-        trafficData.forEach((t) => {
-          if (t.name) {
-            trafficMap[t.name] = {
-              txBps: parseInt(t['tx-bits-per-second'] || '0'),
-              rxBps: parseInt(t['rx-bits-per-second'] || '0'),
-            }
-          }
-        })
-      } catch (err) {
-        console.log('Batch monitor-traffic failed, trying individual:', err.message)
-
-        // Fallback: query each interface individually
-        await Promise.all(
-          activeInterfaceNames.map(async (ifname) => {
-            try {
-              const result = await conn.write('/interface/monitor-traffic', [
-                '=interface=' + ifname,
-                '=once=',
-              ])
-              if (result && result[0]) {
-                trafficMap[ifname] = {
-                  txBps: parseInt(result[0]['tx-bits-per-second'] || '0'),
-                  rxBps: parseInt(result[0]['rx-bits-per-second'] || '0'),
-                }
-              }
-            } catch (e) {
-              // Skip failed interfaces
-            }
-          })
+      const results = await Promise.allSettled(
+        activeInterfaceNames.map((ifname) =>
+          conn.write('/interface/monitor-traffic', [
+            '=interface=' + ifname,
+            '=once=',
+          ])
         )
-      }
+      )
+
+      results.forEach((result, idx) => {
+        const ifname = activeInterfaceNames[idx]
+        if (result.status === 'fulfilled' && result.value && result.value[0]) {
+          const data = result.value[0]
+          trafficMap[ifname] = {
+            txBps: parseInt(data['tx-bits-per-second'] || '0'),
+            rxBps: parseInt(data['rx-bits-per-second'] || '0'),
+          }
+        }
+      })
     }
 
     await conn.close()
