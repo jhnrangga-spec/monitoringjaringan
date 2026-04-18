@@ -22,6 +22,20 @@ function getFlameHeight(bandwidth, maxBandwidth) {
   return Math.min(MAX_FLAME_HEIGHT, Math.max(MIN_FLAME_HEIGHT, ratio * MAX_FLAME_HEIGHT))
 }
 
+// Round max altitude up to a nice Mbps number so the scale looks natural.
+function niceCeilMbps(value) {
+  const steps = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
+  for (const s of steps) if (value <= s) return s
+  return Math.ceil(value / 1000) * 1000
+}
+
+function formatMbps(value) {
+  if (value >= 100) return `${Math.round(value)} Mbps`
+  if (value >= 10) return `${value.toFixed(0)} Mbps`
+  if (value >= 1) return `${value.toFixed(1)} Mbps`
+  return `${(value * 1000).toFixed(0)} Kbps`
+}
+
 export default function RocketRace({ clients }) {
   // Split into active (racing) and inactive (repair station)
   const { activeClients, inactiveClients } = useMemo(() => {
@@ -35,6 +49,13 @@ export default function RocketRace({ clients }) {
     const max = Math.max(...activeClients.map((c) => c.total), 0.1)
     return max
   }, [activeClients])
+
+  // Altitude scale in Mbps — rockets climb to their actual Mbps, not percent.
+  // Adds 30% headroom above the top climber so no rocket pins the ceiling.
+  const maxAltitudeMbps = useMemo(
+    () => niceCeilMbps(Math.max(maxClientBw * 1.3, 1)),
+    [maxClientBw],
+  )
 
   if (!clients || clients.length === 0) {
     return (
@@ -53,17 +74,17 @@ export default function RocketRace({ clients }) {
       <div className="rocket-race">
         <div className="race-track">
           <div className="height-markers">
-            <div className="marker" style={{ bottom: '95%' }}>
-              <span>🏆 Winner</span>
+            <div className="marker" style={{ bottom: '70%' }}>
+              <span>🏆 {formatMbps(maxAltitudeMbps)}</span>
             </div>
-            <div className="marker" style={{ bottom: '75%' }}>
-              <span>75%</span>
+            <div className="marker" style={{ bottom: '52.5%' }}>
+              <span>{formatMbps(maxAltitudeMbps * 0.75)}</span>
             </div>
-            <div className="marker" style={{ bottom: '50%' }}>
-              <span>50%</span>
+            <div className="marker" style={{ bottom: '35%' }}>
+              <span>{formatMbps(maxAltitudeMbps * 0.5)}</span>
             </div>
-            <div className="marker" style={{ bottom: '25%' }}>
-              <span>25%</span>
+            <div className="marker" style={{ bottom: '17.5%' }}>
+              <span>{formatMbps(maxAltitudeMbps * 0.25)}</span>
             </div>
           </div>
 
@@ -76,8 +97,10 @@ export default function RocketRace({ clients }) {
             ) : (
               <AnimatePresence>
                 {activeClients.map((client, index) => {
-                  const heightRatio = client.total / maxClientBw
-                  const heightPercent = Math.min(heightRatio * 100, 55)
+                  // Altitude maps directly to Mbps — 0 Mbps sits on the ground,
+                  // the max-altitude marker is the ceiling. No percent scaling.
+                  const heightRatio = client.total / maxAltitudeMbps
+                  const heightPercent = Math.min(heightRatio * 70, 70)
                   const color = getColorForIndex(index)
                   const isTop3 = index < 3 && client.total > 0
 
