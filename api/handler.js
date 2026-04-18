@@ -68,12 +68,13 @@ export default async function handler(req, res) {
     })
 
     // Calculate bridge total (aggregate upload/download through all bridge interfaces)
+    // Swap: router's TX = client's DOWNLOAD, router's RX = client's UPLOAD
     let bridgeTotalUpload = 0
     let bridgeTotalDownload = 0
     Object.entries(ratesMap).forEach(([name, rate]) => {
       if (rate.type === 'bridge') {
-        bridgeTotalUpload += rate.txBps / 1000000
-        bridgeTotalDownload += rate.rxBps / 1000000
+        bridgeTotalDownload += rate.txBps / 1000000
+        bridgeTotalUpload += rate.rxBps / 1000000
       }
     })
 
@@ -97,8 +98,9 @@ export default async function handler(req, res) {
                     { txBps: 0, rxBps: 0, running: false }
 
       // Convert bits/sec to Mbps
-      const upload = rates.txBps / 1000000
-      const download = rates.rxBps / 1000000
+      // Swap: router's TX = client's DOWNLOAD, router's RX = client's UPLOAD
+      const download = rates.txBps / 1000000
+      const upload = rates.rxBps / 1000000
 
       // Active = has active session OR has traffic OR running interface
       const isActive =
