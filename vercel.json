@@ -1,0 +1,15 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "env": {
+    "MIKROTIK_HOST": "@mikrotik_host",
+    "MIKROTIK_PORT": "@mikrotik_port",
+    "MIKROTIK_USER": "@mikrotik_user",
+    "MIKROTIK_PASSWORD": "@mikrotik_password"
+  },
+  "functions": {
+    "api/handler.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}

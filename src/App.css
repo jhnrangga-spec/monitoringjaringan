@@ -1,0 +1,227 @@
+.app-container {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #050a19;
+  color: #fff;
+  overflow: hidden;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.start-dashboard {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.dashboard-content {
+  text-align: center;
+  max-width: 600px;
+}
+
+.dashboard-title {
+  font-size: 64px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #4da6ff 0%, #64d5ff 50%, #ff6b35 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: bold;
+  text-shadow: 0 0 30px rgba(100, 150, 255, 0.3);
+  filter: drop-shadow(0 0 20px rgba(100, 150, 255, 0.2));
+}
+
+.dashboard-subtitle {
+  font-size: 18px;
+  color: #999;
+  margin-bottom: 50px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.dashboard-footer {
+  font-size: 12px;
+  color: #666;
+  margin-top: 40px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.start-button {
+  padding: 20px 50px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #4da6ff 0%, #64d5ff 100%);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(100, 150, 255, 0.6), inset 0 0 20px rgba(150, 200, 255, 0.2);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.start-button:hover {
+  box-shadow: 0 0 40px rgba(100, 150, 255, 0.8), inset 0 0 30px rgba(150, 200, 255, 0.4);
+  transform: scale(1.02);
+}
+
+.start-button:active {
+  transform: scale(0.98);
+}
+
+.features {
+  display: flex;
+  gap: 30px;
+  margin-top: 60px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.feature {
+  flex: 1;
+  min-width: 150px;
+  padding: 20px;
+  background: rgba(50, 100, 150, 0.2);
+  border: 1px solid rgba(100, 150, 255, 0.3);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.feature:hover {
+  background: rgba(50, 100, 150, 0.3);
+  border-color: rgba(100, 150, 255, 0.6);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(100, 150, 255, 0.2);
+}
+
+.feature-icon {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.feature p {
+  font-size: 14px;
+  color: #999;
+  margin: 0;
+}
+
+.stop-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(255, 100, 50, 0.6);
+  transition: all 0.3s ease;
+  z-index: 100;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stop-button:hover {
+  box-shadow: 0 0 25px rgba(255, 100, 50, 0.8);
+  transform: scale(1.05);
+}
+
+.stop-button:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+  .dashboard-title {
+    font-size: 40px;
+    margin-bottom: 15px;
+  }
+
+  .dashboard-subtitle {
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  .start-button {
+    padding: 15px 35px;
+    font-size: 16px;
+  }
+
+  .features {
+    gap: 15px;
+    margin-top: 40px;
+  }
+
+  .feature {
+    min-width: 120px;
+    padding: 15px;
+  }
+
+  .feature-icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
+
+  .feature p {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-title {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .dashboard-subtitle {
+    font-size: 12px;
+    margin-bottom: 30px;
+  }
+
+  .start-button {
+    padding: 12px 25px;
+    font-size: 14px;
+  }
+
+  .features {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 30px;
+  }
+
+  .stop-button {
+    padding: 10px 15px;
+    font-size: 12px;
+    top: 15px;
+    right: 15px;
+  }
+}
