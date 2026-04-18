@@ -1,3 +1,9 @@
+.rocket-race-wrapper {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
 .rocket-race {
   display: flex;
   gap: 30px;
@@ -10,7 +16,8 @@
 }
 
 .race-track {
-  flex: 2;
+  flex: 1 1 auto;
+  min-width: 0;
   min-height: 550px;
   height: 600px;
   position: relative;
