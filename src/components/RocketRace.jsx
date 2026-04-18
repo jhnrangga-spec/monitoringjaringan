@@ -12,12 +12,21 @@ function getColorForIndex(index) {
   return ROCKET_COLORS[index % ROCKET_COLORS.length]
 }
 
-export default function RocketRace({ clients, maxBandwidth }) {
-  // Determine race track height scale
+// Cap flame height so it doesn't overflow
+const MAX_FLAME_HEIGHT = 60
+const MIN_FLAME_HEIGHT = 8
+
+function getFlameHeight(bandwidth, maxBandwidth) {
+  if (bandwidth <= 0) return 0
+  const ratio = bandwidth / Math.max(maxBandwidth, 0.1)
+  return Math.min(MAX_FLAME_HEIGHT, Math.max(MIN_FLAME_HEIGHT, ratio * MAX_FLAME_HEIGHT))
+}
+
+export default function RocketRace({ clients }) {
   const maxClientBw = useMemo(() => {
-    if (!clients || clients.length === 0) return 10
-    const max = Math.max(...clients.map((c) => c.total), 10)
-    return Math.max(max, 10)
+    if (!clients || clients.length === 0) return 1
+    const max = Math.max(...clients.map((c) => c.total), 0.1)
+    return max
   }, [clients])
 
   if (!clients || clients.length === 0) {
@@ -35,9 +44,8 @@ export default function RocketRace({ clients, maxBandwidth }) {
   return (
     <div className="rocket-race">
       <div className="race-track">
-        {/* Height markers */}
         <div className="height-markers">
-          <div className="marker" style={{ bottom: '100%' }}>
+          <div className="marker" style={{ bottom: '95%' }}>
             <span>🏆 Winner</span>
           </div>
           <div className="marker" style={{ bottom: '75%' }}>
@@ -49,16 +57,18 @@ export default function RocketRace({ clients, maxBandwidth }) {
           <div className="marker" style={{ bottom: '25%' }}>
             <span>25%</span>
           </div>
-          <div className="ground-line" />
         </div>
 
-        {/* Rockets */}
         <div className="rockets-container">
           <AnimatePresence>
             {clients.map((client, index) => {
-              const heightPercent = Math.min((client.total / maxClientBw) * 100, 100)
+              const heightRatio = client.total / maxClientBw
+              const heightPercent = Math.min(heightRatio * 100, 95)
               const color = getColorForIndex(index)
-              const isTop3 = index < 3
+              const isTop3 = index < 3 && client.isActive && client.total > 0
+
+              const uploadFlame = getFlameHeight(client.upload, maxClientBw)
+              const downloadFlame = getFlameHeight(client.download, maxClientBw)
 
               return (
                 <motion.div
@@ -72,20 +82,19 @@ export default function RocketRace({ clients, maxBandwidth }) {
                 >
                   <motion.div
                     className="mini-rocket-wrapper"
+                    initial={{ bottom: '0%' }}
                     animate={{
-                      y: client.isActive ? -heightPercent * 3.5 : 0,
-                      opacity: client.isActive ? 1 : 0.3,
-                      rotate: client.isActive ? 0 : [0, -8, 8, 0],
+                      bottom: client.isActive ? `${heightPercent}%` : '0%',
+                      rotate: !client.isActive ? [0, -8, 8, 0] : 0,
                     }}
                     transition={{
-                      y: { duration: 0.8, ease: 'easeOut' },
-                      opacity: { duration: 0.5 },
-                      rotate: client.isActive
-                        ? { duration: 0 }
-                        : { duration: 0.5, repeat: Infinity },
+                      bottom: { duration: 1, ease: 'easeOut' },
+                      rotate: !client.isActive
+                        ? { duration: 0.5, repeat: Infinity }
+                        : { duration: 0 },
                     }}
                   >
-                    {isTop3 && client.isActive && (
+                    {isTop3 && (
                       <div className={`rank-badge rank-${index + 1}`}>
                         {index === 0 && '🥇'}
                         {index === 1 && '🥈'}
@@ -93,64 +102,65 @@ export default function RocketRace({ clients, maxBandwidth }) {
                       </div>
                     )}
 
-                    <svg
-                      className="mini-rocket"
-                      viewBox="0 0 40 80"
-                      style={{ filter: `drop-shadow(0 0 10px ${color})` }}
-                    >
-                      <polygon points="20,0 15,15 25,15" fill={color} />
-                      <rect x="12" y="15" width="16" height="40" fill="#e0e0e0" rx="2" />
-                      <rect
-                        x="12"
-                        y="15"
-                        width="16"
-                        height="40"
-                        fill="none"
-                        stroke={color}
-                        strokeWidth="1.5"
-                        rx="2"
-                      />
-                      <circle cx="20" cy="25" r="2" fill={color} />
-                      <circle cx="20" cy="33" r="2" fill={color} />
-                      <polygon points="12,45 7,60 12,58" fill={color} />
-                      <polygon points="28,45 33,60 28,58" fill={color} />
-                      <rect x="13" y="55" width="14" height="6" fill="#333" />
-                    </svg>
-
-                    {/* Flames - blue upload, red download */}
-                    {client.isActive && (
-                      <>
-                        <motion.div
-                          className="mini-flame flame-up"
-                          animate={{
-                            height: [
-                              Math.max(client.upload * 3, 5),
-                              Math.max(client.upload * 4, 8),
-                              Math.max(client.upload * 3, 5),
-                            ],
-                            opacity: [0.7, 1, 0.7],
-                          }}
-                          transition={{ duration: 0.2, repeat: Infinity }}
+                    <div className="rocket-body-wrapper">
+                      <svg
+                        className="mini-rocket"
+                        viewBox="0 0 40 80"
+                        style={{
+                          filter: client.isActive
+                            ? `drop-shadow(0 0 10px ${color})`
+                            : 'grayscale(1) brightness(0.5)',
+                        }}
+                      >
+                        <polygon points="20,0 15,15 25,15" fill={color} />
+                        <rect x="12" y="15" width="16" height="40" fill="#e0e0e0" rx="2" />
+                        <rect
+                          x="12"
+                          y="15"
+                          width="16"
+                          height="40"
+                          fill="none"
+                          stroke={color}
+                          strokeWidth="1.5"
+                          rx="2"
                         />
-                        <motion.div
-                          className="mini-flame flame-down"
-                          animate={{
-                            height: [
-                              Math.max(client.download * 3, 5),
-                              Math.max(client.download * 4, 8),
-                              Math.max(client.download * 3, 5),
-                            ],
-                            opacity: [0.7, 1, 0.7],
-                          }}
-                          transition={{ duration: 0.2, repeat: Infinity, delay: 0.1 }}
-                        />
-                      </>
-                    )}
+                        <circle cx="20" cy="25" r="2" fill={color} />
+                        <circle cx="20" cy="33" r="2" fill={color} />
+                        <polygon points="12,45 7,60 12,58" fill={color} />
+                        <polygon points="28,45 33,60 28,58" fill={color} />
+                        <rect x="13" y="55" width="14" height="6" fill="#333" />
+                      </svg>
 
-                    {/* Broken state indicator */}
-                    {!client.isActive && (
-                      <div className="broken-indicator">💥</div>
-                    )}
+                      {/* Flames - only visible when active and has traffic */}
+                      {client.isActive && (uploadFlame > 0 || downloadFlame > 0) && (
+                        <div className="flames-container">
+                          {uploadFlame > 0 && (
+                            <motion.div
+                              className="mini-flame flame-up"
+                              animate={{
+                                height: [uploadFlame * 0.9, uploadFlame, uploadFlame * 0.9],
+                                opacity: [0.7, 1, 0.7],
+                              }}
+                              transition={{ duration: 0.3, repeat: Infinity }}
+                            />
+                          )}
+                          {downloadFlame > 0 && (
+                            <motion.div
+                              className="mini-flame flame-down"
+                              animate={{
+                                height: [downloadFlame * 0.9, downloadFlame, downloadFlame * 0.9],
+                                opacity: [0.7, 1, 0.7],
+                              }}
+                              transition={{ duration: 0.3, repeat: Infinity, delay: 0.15 }}
+                            />
+                          )}
+                        </div>
+                      )}
+
+                      {!client.isActive && (
+                        <div className="broken-indicator">💥</div>
+                      )}
+                    </div>
                   </motion.div>
 
                   <div className="rocket-label">
@@ -158,7 +168,9 @@ export default function RocketRace({ clients, maxBandwidth }) {
                       {client.name}
                     </span>
                     <span className="rocket-bw">
-                      {client.total.toFixed(2)} Mbps
+                      {client.total < 1
+                        ? `${(client.total * 1000).toFixed(0)} Kbps`
+                        : `${client.total.toFixed(2)} Mbps`}
                     </span>
                   </div>
                 </motion.div>
@@ -187,23 +199,14 @@ export default function RocketRace({ clients, maxBandwidth }) {
                 {index === 2 && '🥉'}
                 {index > 2 && `#${index + 1}`}
               </span>
-              <span
-                className="name"
-                style={{ color: getColorForIndex(index) }}
-              >
+              <span className="name" style={{ color: getColorForIndex(index) }}>
                 {client.name}
               </span>
               <div className="bw-bars">
-                <span className="bw-up">
-                  ↑ {client.upload.toFixed(2)}
-                </span>
-                <span className="bw-down">
-                  ↓ {client.download.toFixed(2)}
-                </span>
+                <span className="bw-up">↑ {client.upload.toFixed(2)}</span>
+                <span className="bw-down">↓ {client.download.toFixed(2)}</span>
               </div>
-              <span className="status-dot">
-                {client.isActive ? '🟢' : '🔴'}
-              </span>
+              <span className="status-dot">{client.isActive ? '🟢' : '🔴'}</span>
             </motion.div>
           ))}
         </div>

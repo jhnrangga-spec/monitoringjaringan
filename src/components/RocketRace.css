@@ -11,7 +11,8 @@
 
 .race-track {
   flex: 2;
-  min-height: 500px;
+  min-height: 550px;
+  height: 600px;
   position: relative;
   background: linear-gradient(to top, rgba(10, 30, 60, 0.3) 0%, rgba(10, 30, 60, 0) 100%);
   border-radius: 15px;
@@ -23,7 +24,7 @@
 .height-markers {
   position: absolute;
   top: 20px;
-  bottom: 80px;
+  bottom: 100px;
   left: 20px;
   right: 20px;
   pointer-events: none;
@@ -47,25 +48,16 @@
   margin-top: -8px;
 }
 
-.ground-line {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(100, 210, 255, 0.5), transparent);
-}
-
 .rockets-container {
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   justify-content: flex-start;
   gap: 8px;
   height: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 20px 10px 80px 10px;
+  padding: 0 10px 80px 10px;
   scrollbar-width: thin;
   scrollbar-color: rgba(100, 150, 255, 0.5) rgba(10, 30, 60, 0.3);
 }
@@ -86,12 +78,8 @@
 
 .rocket-slot {
   flex: 0 0 70px;
-  height: 100%;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
+  height: 100%;
 }
 
 .rocket-slot.top-rank {
@@ -99,6 +87,16 @@
 }
 
 .mini-rocket-wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.rocket-body-wrapper {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -109,6 +107,7 @@
   width: 40px;
   height: 80px;
   z-index: 2;
+  position: relative;
 }
 
 .rocket-slot.top-rank .mini-rocket {
@@ -116,25 +115,33 @@
   height: 100px;
 }
 
-.mini-flame {
+.flames-container {
   position: absolute;
-  bottom: -15px;
-  width: 16px;
-  border-radius: 50% 50% 0 0;
-  filter: blur(2px);
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  pointer-events: none;
   z-index: 1;
 }
 
+.mini-flame {
+  width: 10px;
+  border-radius: 50% 50% 20% 20% / 70% 70% 30% 30%;
+  filter: blur(2px);
+  transform-origin: top center;
+}
+
 .mini-flame.flame-up {
-  background: linear-gradient(to bottom, transparent, #4da6ff, #64d5ff);
+  background: linear-gradient(to bottom, rgba(100, 210, 255, 0.9), #4da6ff, transparent);
   box-shadow: 0 0 15px rgba(100, 150, 255, 0.8);
-  left: 4px;
 }
 
 .mini-flame.flame-down {
-  background: linear-gradient(to bottom, transparent, #ff6b35, #ff8c5a);
+  background: linear-gradient(to bottom, rgba(255, 180, 130, 0.9), #ff6b35, transparent);
   box-shadow: 0 0 15px rgba(255, 100, 50, 0.8);
-  right: 4px;
 }
 
 .rank-badge {
@@ -168,11 +175,13 @@
 
 .rocket-label {
   position: absolute;
-  bottom: -70px;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 80px;
   text-align: center;
   z-index: 3;
-  background: rgba(10, 30, 60, 0.8);
+  background: rgba(10, 30, 60, 0.9);
   padding: 4px 6px;
   border-radius: 8px;
   border: 1px solid rgba(100, 150, 255, 0.3);
@@ -339,7 +348,8 @@
   }
 
   .race-track {
-    min-height: 450px;
+    min-height: 500px;
+    height: 500px;
   }
 }
 
@@ -350,7 +360,8 @@
   }
 
   .race-track {
-    min-height: 400px;
+    min-height: 450px;
+    height: 450px;
     padding: 15px;
   }
 
@@ -411,7 +422,8 @@
 
 @media (max-width: 480px) {
   .race-track {
-    min-height: 350px;
+    min-height: 400px;
+    height: 400px;
     padding: 10px;
   }
 
