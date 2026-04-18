@@ -33,8 +33,8 @@ function App() {
     // Initial fetch
     await fetchData()
 
-    // Set up interval for continuous updates
-    const interval = setInterval(fetchData, 1000)
+    // Set up interval for continuous updates (2s to account for sampling delay)
+    const interval = setInterval(fetchData, 2000)
     setIntervalRef(interval)
   }
 

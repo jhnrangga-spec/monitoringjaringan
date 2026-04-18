@@ -1,5 +1,7 @@
 import { RouterOSAPI } from 'node-routeros'
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
@@ -15,80 +17,86 @@ export default async function handler(req, res) {
     port: mikrotikPort,
     user: mikrotikUser,
     password: mikrotikPassword,
-    timeout: 10,
+    timeout: 15,
   })
 
   try {
     await conn.connect()
 
-    // Get PPPoE server bindings (all clients config)
-    const pppoeClients = await conn.write('/interface/pppoe-server/print').catch(() => [])
-
-    // Get active PPP sessions (currently connected)
+    // Get active PPP sessions (currently connected users)
     const activeSessions = await conn.write('/ppp/active/print').catch(() => [])
 
-    const isRunning = activeSessions.length > 0 || pppoeClients.length > 0
+    // Get PPPoE server bindings (all configured clients)
+    const pppoeClients = await conn.write('/interface/pppoe-server/print').catch(() => [])
 
-    // Build map of active interfaces by user
-    const activeByUser = {}
-    activeSessions.forEach((session) => {
-      if (session.name) activeByUser[session.name] = session
-      if (session.user) activeByUser[session.user] = session
-    })
+    // Take first snapshot of interface byte counters
+    const snapshot1 = await conn.write('/interface/print').catch(() => [])
+    const snapshotTime1 = Date.now()
 
-    // Get real-time traffic for active interfaces only
-    // Use /interface/monitor-traffic with =once= to get immediate rates
-    const activeInterfaceNames = activeSessions
-      .map((s) => s.name)
-      .filter(Boolean)
+    // Wait ~1 second for rate calculation
+    await sleep(1000)
 
-    let trafficMap = {}
-
-    // Use /interface/monitor-traffic with =once= for each active interface
-    // Individual calls are more reliable than batched across RouterOS versions
-    if (activeInterfaceNames.length > 0) {
-      const results = await Promise.allSettled(
-        activeInterfaceNames.map((ifname) =>
-          conn.write('/interface/monitor-traffic', [
-            '=interface=' + ifname,
-            '=once=',
-          ])
-        )
-      )
-
-      results.forEach((result, idx) => {
-        const ifname = activeInterfaceNames[idx]
-        if (result.status === 'fulfilled' && result.value && result.value[0]) {
-          const data = result.value[0]
-          trafficMap[ifname] = {
-            txBps: parseInt(data['tx-bits-per-second'] || '0'),
-            rxBps: parseInt(data['rx-bits-per-second'] || '0'),
-          }
-        }
-      })
-    }
+    // Take second snapshot
+    const snapshot2 = await conn.write('/interface/print').catch(() => [])
+    const snapshotTime2 = Date.now()
 
     await conn.close()
 
-    // Build client list
+    const timeDeltaSec = (snapshotTime2 - snapshotTime1) / 1000
+
+    // Calculate real-time rates from byte counter delta
+    const ratesMap = {}
+    snapshot2.forEach((s2) => {
+      if (!s2.name) return
+      const s1 = snapshot1.find((x) => x.name === s2.name)
+      if (!s1) return
+
+      const tx1 = parseInt(s1['tx-byte'] || '0')
+      const tx2 = parseInt(s2['tx-byte'] || '0')
+      const rx1 = parseInt(s1['rx-byte'] || '0')
+      const rx2 = parseInt(s2['rx-byte'] || '0')
+
+      const txBytesPerSec = Math.max(0, (tx2 - tx1) / timeDeltaSec)
+      const rxBytesPerSec = Math.max(0, (rx2 - rx1) / timeDeltaSec)
+
+      ratesMap[s2.name] = {
+        txBps: txBytesPerSec * 8, // bytes to bits
+        rxBps: rxBytesPerSec * 8,
+        running: s2.running === 'true' || s2.running === true,
+      }
+    })
+
+    const isRunning = activeSessions.length > 0 || pppoeClients.length > 0
+
+    // Build map of active sessions by user name
+    const activeByUser = {}
+    activeSessions.forEach((session) => {
+      if (session.name) activeByUser[session.name] = session
+    })
+
+    // Build client list with bandwidth data
     const clients = pppoeClients.map((client) => {
       const name = client.name || client.user || 'Unknown'
       const cleanName = name.replace(/^<pppoe-/, '').replace(/>$/, '')
 
-      // Find traffic data for this client's interface
-      const traffic = trafficMap[client.name] || trafficMap[cleanName] || { txBps: 0, rxBps: 0 }
+      // Look up rate by interface name (binding name = interface name)
+      const rates = ratesMap[client.name] ||
+                    ratesMap[cleanName] ||
+                    ratesMap[`<pppoe-${client.user}>`] ||
+                    { txBps: 0, rxBps: 0, running: false }
 
-      // Convert bits/sec to Mbps (divide by 1,000,000)
-      const upload = traffic.txBps / 1000000
-      const download = traffic.rxBps / 1000000
+      // Convert bits/sec to Mbps
+      const upload = rates.txBps / 1000000
+      const download = rates.rxBps / 1000000
 
-      // Client is active if it has an active session OR traffic
+      // Active = has active session OR has traffic OR running interface
       const isActive =
         client.disabled !== 'true' &&
         (activeByUser[client.user] !== undefined ||
           activeByUser[cleanName] !== undefined ||
-          traffic.txBps > 0 ||
-          traffic.rxBps > 0)
+          rates.running ||
+          rates.txBps > 0 ||
+          rates.rxBps > 0)
 
       return {
         id: client['.id'] || name,
@@ -116,6 +124,7 @@ export default async function handler(req, res) {
       totalDownload,
       totalBandwidth: totalUpload + totalDownload,
       clients,
+      samplingInterval: timeDeltaSec,
       timestamp: new Date().toISOString(),
     })
   } catch (error) {
