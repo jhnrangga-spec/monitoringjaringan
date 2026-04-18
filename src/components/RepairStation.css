@@ -1,0 +1,331 @@
+.repair-station {
+  width: 100%;
+  max-width: 1400px;
+  margin: 30px auto 0;
+  padding: 20px;
+  background: rgba(40, 20, 10, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 140, 90, 0.3);
+  border-radius: 15px;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 0 30px rgba(255, 100, 50, 0.1);
+}
+
+.repair-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 140, 90, 0.2);
+}
+
+.repair-icon {
+  font-size: 28px;
+  display: inline-block;
+  transform-origin: center;
+}
+
+.repair-header h3 {
+  color: #ffa070;
+  margin: 0;
+  font-size: 20px;
+  text-shadow: 0 0 10px rgba(255, 140, 90, 0.5);
+  flex: 1;
+}
+
+.repair-count {
+  font-size: 12px;
+  color: #aaa;
+  background: rgba(255, 100, 50, 0.2);
+  border: 1px solid rgba(255, 140, 90, 0.3);
+  padding: 4px 12px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.repair-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+.broken-rocket-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.repair-bay {
+  position: relative;
+  width: 100px;
+  height: 120px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: radial-gradient(
+    ellipse at bottom,
+    rgba(255, 140, 90, 0.15) 0%,
+    transparent 70%
+  );
+  border-radius: 8px;
+  overflow: visible;
+}
+
+.repair-platform {
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 140, 90, 0.4),
+    transparent
+  );
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(255, 140, 90, 0.3);
+}
+
+.broken-rocket-container {
+  position: relative;
+  width: 40px;
+  height: 80px;
+  margin-bottom: 8px;
+  z-index: 2;
+}
+
+.broken-rocket {
+  width: 100%;
+  height: 100%;
+  filter: grayscale(1) brightness(0.6);
+}
+
+.smoke-puff {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(
+    circle,
+    rgba(150, 150, 150, 0.8) 0%,
+    rgba(100, 100, 100, 0.4) 50%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.wrench {
+  position: absolute;
+  top: 15%;
+  left: 5%;
+  font-size: 18px;
+  z-index: 3;
+  filter: drop-shadow(0 0 4px rgba(255, 200, 100, 0.6));
+}
+
+.gear {
+  position: absolute;
+  bottom: 20%;
+  right: 5%;
+  font-size: 16px;
+  z-index: 3;
+  filter: drop-shadow(0 0 4px rgba(255, 200, 100, 0.6));
+}
+
+.spark {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  background: #ffcc44;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #ffcc44, 0 0 12px #ff8844;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.repair-status {
+  position: absolute;
+  bottom: -2px;
+  left: 10%;
+  right: 10%;
+  height: 3px;
+  background: #333;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.repair-progress {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b35 0%, #ff6b35 30%, #555 30%, #555 100%);
+  border-radius: 2px;
+}
+
+.broken-rocket-label {
+  text-align: center;
+  padding: 4px 8px;
+  background: rgba(40, 20, 10, 0.6);
+  border: 1px solid rgba(255, 140, 90, 0.2);
+  border-radius: 6px;
+  width: 100%;
+  max-width: 100px;
+}
+
+.broken-name {
+  display: block;
+  font-size: 11px;
+  color: #ffa070;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.broken-status {
+  display: block;
+  font-size: 9px;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .repair-station {
+    padding: 15px;
+    margin-top: 20px;
+  }
+
+  .repair-header h3 {
+    font-size: 16px;
+  }
+
+  .repair-icon {
+    font-size: 22px;
+  }
+
+  .repair-count {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .repair-grid {
+    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+    gap: 10px;
+  }
+
+  .repair-bay {
+    width: 80px;
+    height: 100px;
+  }
+
+  .broken-rocket-container {
+    width: 32px;
+    height: 64px;
+  }
+
+  .wrench {
+    font-size: 14px;
+  }
+
+  .gear {
+    font-size: 12px;
+  }
+
+  .broken-rocket-label {
+    max-width: 80px;
+  }
+
+  .broken-name {
+    font-size: 10px;
+  }
+
+  .broken-status {
+    font-size: 8px;
+  }
+}
+
+/* iPhone 11 and mobile */
+@media (max-width: 480px) {
+  .repair-station {
+    padding: 12px;
+  }
+
+  .repair-header {
+    gap: 8px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+  }
+
+  .repair-header h3 {
+    font-size: 14px;
+  }
+
+  .repair-icon {
+    font-size: 20px;
+  }
+
+  .repair-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+  }
+
+  .repair-bay {
+    width: 70px;
+    height: 90px;
+  }
+
+  .broken-rocket-container {
+    width: 28px;
+    height: 56px;
+  }
+
+  .wrench {
+    font-size: 12px;
+    top: 10%;
+  }
+
+  .gear {
+    font-size: 11px;
+  }
+
+  .broken-rocket-label {
+    max-width: 70px;
+    padding: 3px 6px;
+  }
+
+  .broken-name {
+    font-size: 9px;
+  }
+
+  .broken-status {
+    font-size: 7px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 375px) {
+  .repair-grid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 6px;
+  }
+
+  .repair-bay {
+    width: 62px;
+    height: 80px;
+  }
+
+  .broken-rocket-container {
+    width: 24px;
+    height: 48px;
+  }
+}
