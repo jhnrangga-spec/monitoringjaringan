@@ -57,7 +57,7 @@
   height: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0 10px 80px 10px;
+  padding: 40px 10px 80px 10px;
   scrollbar-width: thin;
   scrollbar-color: rgba(100, 150, 255, 0.5) rgba(10, 30, 60, 0.3);
 }
@@ -360,9 +360,13 @@
   }
 
   .race-track {
-    min-height: 450px;
-    height: 450px;
+    min-height: 500px;
+    height: 500px;
     padding: 15px;
+  }
+
+  .rockets-container {
+    padding: 50px 8px 70px 8px;
   }
 
   .rocket-slot {
@@ -370,21 +374,26 @@
   }
 
   .rocket-slot.top-rank {
-    flex: 0 0 65px;
+    flex: 0 0 60px;
   }
 
   .mini-rocket {
-    width: 32px;
-    height: 65px;
+    width: 28px;
+    height: 56px;
   }
 
   .rocket-slot.top-rank .mini-rocket {
-    width: 40px;
-    height: 80px;
+    width: 34px;
+    height: 68px;
+  }
+
+  .rank-badge {
+    font-size: 16px;
+    top: -24px;
   }
 
   .rocket-label {
-    width: 65px;
+    width: 60px;
     padding: 3px 4px;
   }
 
@@ -422,22 +431,49 @@
 
 @media (max-width: 480px) {
   .race-track {
-    min-height: 400px;
-    height: 400px;
+    min-height: 450px;
+    height: 450px;
     padding: 10px;
+  }
+
+  .rockets-container {
+    padding: 45px 6px 65px 6px;
   }
 
   .rocket-slot {
     flex: 0 0 45px;
   }
 
+  .rocket-slot.top-rank {
+    flex: 0 0 50px;
+  }
+
   .mini-rocket {
+    width: 24px;
+    height: 48px;
+  }
+
+  .rocket-slot.top-rank .mini-rocket {
     width: 28px;
-    height: 55px;
+    height: 56px;
+  }
+
+  .rank-badge {
+    font-size: 14px;
+    top: -20px;
   }
 
   .rocket-label {
-    width: 55px;
+    width: 50px;
+    padding: 2px 3px;
+  }
+
+  .rocket-name {
+    font-size: 8px;
+  }
+
+  .rocket-bw {
+    font-size: 7px;
   }
 
   .leaderboard {

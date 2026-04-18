@@ -63,6 +63,17 @@ export default async function handler(req, res) {
         txBps: txBytesPerSec * 8, // bytes to bits
         rxBps: rxBytesPerSec * 8,
         running: s2.running === 'true' || s2.running === true,
+        type: s2.type || '',
+      }
+    })
+
+    // Calculate bridge total (aggregate upload/download through all bridge interfaces)
+    let bridgeTotalUpload = 0
+    let bridgeTotalDownload = 0
+    Object.entries(ratesMap).forEach(([name, rate]) => {
+      if (rate.type === 'bridge') {
+        bridgeTotalUpload += rate.txBps / 1000000
+        bridgeTotalDownload += rate.rxBps / 1000000
       }
     })
 
@@ -112,9 +123,13 @@ export default async function handler(req, res) {
     // Sort by total bandwidth (highest first)
     clients.sort((a, b) => b.total - a.total)
 
-    const totalUpload = clients.reduce((sum, c) => sum + c.upload, 0)
-    const totalDownload = clients.reduce((sum, c) => sum + c.download, 0)
+    const clientsUpload = clients.reduce((sum, c) => sum + c.upload, 0)
+    const clientsDownload = clients.reduce((sum, c) => sum + c.download, 0)
     const activeCount = clients.filter((c) => c.isActive).length
+
+    // Prefer bridge totals if available (more accurate), otherwise sum of clients
+    const totalUpload = bridgeTotalUpload > 0 ? bridgeTotalUpload : clientsUpload
+    const totalDownload = bridgeTotalDownload > 0 ? bridgeTotalDownload : clientsDownload
 
     return res.status(200).json({
       isRunning,
@@ -123,6 +138,8 @@ export default async function handler(req, res) {
       totalUpload,
       totalDownload,
       totalBandwidth: totalUpload + totalDownload,
+      bridgeUpload: bridgeTotalUpload,
+      bridgeDownload: bridgeTotalDownload,
       clients,
       samplingInterval: timeDeltaSec,
       timestamp: new Date().toISOString(),
